@@ -1,8 +1,8 @@
 const request = require('supertest');
 
 const app = require('../../src/app');
-const { User } = require('../../src/app/models');
 const truncate = require('../utils/truncate');
+const factory = require('../factories');
 
 describe('Autentication', () => {
   beforeEach(async () => {
@@ -10,26 +10,22 @@ describe('Autentication', () => {
   });
 
   it('should authenticate with valid credentials', async () => {
-    const user = await User.create({
-      name: 'Remulo',
-      email: 'remulo.costa@gmail.com',
-      password: '123456'
+    const user = await factory.create('User', {
+      password: '123123'
     });
 
     const response = await request(app)
       .post('/sessions')
       .send({
         email: user.email,
-        password: '123456'
+        password: '123123'
       });
 
     expect(response.status).toBe(200);
   });
 
   it('should not authenticate with invalid credentials', async () => {
-    const user = await User.create({
-      name: 'Remulo',
-      email: 'remulo.costa@gmail.com',
+    const user = await factory.create('User', {
       password: '123123'
     });
 
@@ -44,9 +40,7 @@ describe('Autentication', () => {
   });
 
   it('should return jwt token when credentials', async () => {
-    const user = await User.create({
-      name: 'Remulo',
-      email: 'remulo.costa@gmail.com',
+    const user = await factory.create('User', {
       password: '123123'
     });
 
@@ -57,23 +51,8 @@ describe('Autentication', () => {
         password: '123123'
       });
 
-    expect(response.body).toProperty('token');
+    expect(response.body).toHaveProperty('token');
   });
 
 
 });
-
-
-
-
-// it('should sum two numbers', async () => {
-//   const user = await User.create({
-//     name: 'Remulo',
-//     email: 'remulo.costa@gmail.com',
-//     password_hash: '123123'
-//  });
-
-//  console.log(user);
-
-//   expect(user.email).toBe('remulo.costa@gmail.com');
-// });
